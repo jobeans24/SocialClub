@@ -18,3 +18,6 @@ SO THAT my website can handle large amounts of unstructured data
 
 * It is done when the user tests the API POST and DELETE routes in Insomnia and are able to successfully create and delete reactions to thoughts and add and remove friends to a user's friend list
 
+## Description
+
+    This application allows the user to work through insomnia to show the Social Clubs data. The code allows the user to see all the Users on Social Club as well as there Thoughts and reactions. The code will allow the user to make GET, POST, PUT, and DELETE requests.

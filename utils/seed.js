@@ -1,40 +1,69 @@
-const connection = require('./config/connection');
-const { User, Thought } = require('./models');
+const mongoose = require('mongoose');
+const User = require('../models/User');
+const Thought = require('../models/Thoughts');
 
-connnection.on("error", console.error.bind(console, "connection error:"));
+const mongodb = 'mongodb://localhost:27017/socialNetworkDB';
 
-connection.once("open", async () => {  
- console.log("connected to database");
+mongoose.connect(mongodb, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+    useCreateIndex: true
+});
 
- let userCheck = await connection.db
-    .listCollections({ name: "users" })
-    .toArray();
-    if (userCheck.length) {
-        await connection.db.dropCollection("users");
-    }
-
-    let thoughtCheck = await connection.db
-    .listCollections({ name: "thoughts" })
-    .toArray();
-    if (thoughtCheck.length) {
-        await connection.db.dropCollection("thoughts");
-    }
-
-    await User.create({
-        username: "testUser",
-        email: "",
+const seedUsers = [
+    {
+        username: 'CaptainAmerica',
+        email: 'capt@merica.com',
         thoughts: [],
-        friends: [],
+        friends: []
+    },
+    {
+        username: 'Falcon',
+        email: 'falcon@fly.com',
+        thoughts: [],
+        friends: []
+    },
+    {
+        username: 'WinterSoldier',
+        email: 'winter@soldier.com',
+        thoughts: [],
+        friends: []
+    }
+];
+
+const seedThoughts = [
+    {
+        thoughtText: 'Avengers Assemble! We have a world to save!',
+        username: 'CaptainAmerica',
+        reactions: []
+    },
+    {
+        thoughtText: 'I can fly! I can fly! I can fly!',
+        username: 'Falcon',
+        reactions: []
+    },
+    {
+        thoughtText: 'My arm is made of vibranium. What is your arm made of?',
+        username: 'WinterSoldier',
+        reactions: []
+    }
+];
+
+const seedAll = async () => {
+    await User.deleteMany();
+    await Thought.deleteMany();
+
+    const users = await User.insertMany(seedUsers);
+
+    seedThoughts.forEach(thought => {
+        thought.userId = users.find(user => user.username === thought.username)._id;
     });
 
-    await Thought.create({
-        thoughtText: "test thought",
-        username: "testUser",
-        reactions: [],
-    });
+    await Thought.insertMany(seedThoughts);
 
-    console.log("seeded database");
-
+    console.log('Users and Thoughts seeded!');
     process.exit(0);
-}
-);
+};
+
+seedAll();
