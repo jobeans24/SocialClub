@@ -1,9 +1,9 @@
-const { Thought, User } = require("../models");
+const { Thoughts, User } = require("../models");
 
 module.exports = {
     // get all thoughts
     getAllThoughts(req, res) {
-            Thought.find()
+            Thoughts.find()
                 .populate({ path: 'reactions', select: '-__v' })
                 .select('-__v')
                 .then(dbThoughtData => {
@@ -16,7 +16,7 @@ module.exports = {
         },
         // get thought by id
         getThoughtById({ params }, res) {
-            Thought.findOne({ _id: params.id })
+            Thoughts.findOne({ _id: params.id })
                 .populate({ path: 'reactions', select: '-__v' })
                 .select('-__v')
                 .then(dbThoughtData => {
@@ -33,7 +33,7 @@ module.exports = {
         },
         // create thought
         createThought({ body }, res) {
-            Thought.create(body)
+            Thoughts.create(body)
                 .then(({ _id }) => {
                     return User.findOneAndUpdate(
                         { _id: body.userId },
@@ -52,7 +52,7 @@ module.exports = {
         },
         // update thought by id
         updateThought({ params, body }, res) {
-            Thought.findOneAndUpdate({ _id: params.id }, body, { new: true, runValidators: true })
+            Thoughts.findOneAndUpdate({ _id: params.id }, body, { new: true, runValidators: true })
                 .then(dbThoughtData => {
                     if (!dbThoughtData) {
                         res.status(404).json({ message: 'No thought found with this id!' });
@@ -64,7 +64,7 @@ module.exports = {
         },
         // delete thought
         deleteThought({ params }, res) {
-            Thought.findOneAndDelete({ _id: params.id })
+            Thoughts.findOneAndDelete({ _id: params.id })
                 .then(deletedThought => {
                     if (!deletedThought) {
                         return res.status(404).json({ message: 'No thought with this id!' });
@@ -86,7 +86,7 @@ module.exports = {
         },
         // add reaction
         addReaction({ params, body }, res) {
-            Thought.findOneAndUpdate(
+            Thoughts.findOneAndUpdate(
                 { _id: params.thoughtId },
                 { $push: { reactions: body } },
                 { new: true, runValidators: true }
@@ -102,7 +102,7 @@ module.exports = {
         },
         // remove reaction
         removeReaction({ params }, res) {
-            Thought.findOneAndUpdate(
+            Thoughts.findOneAndUpdate(
                 { _id: params.thoughtId },
                 { $pull: { reactions: { reactionId: params.reactionId } } },
                 { new: true }
